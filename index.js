@@ -27,13 +27,15 @@ const start = async () => {
     switch (choice) {
         case 'View all departments':
             const departments = await viewAllDepartments()
-            return console.table(departments)
+            console.table(departments)
+            break;
         case 'View all roles':
             const roles = await viewAllRoles()
-            return console.table(roles)
+            console.table(roles)
+            break;
         case 'View all employees':
             const employees = await viewAllEmployees()
-            return console.table(employees)
+            console.table(employees)
     }
     
 }
