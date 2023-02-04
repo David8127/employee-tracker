@@ -1,9 +1,9 @@
 
 const { prompt } = require("inquirer");
 const db = require("./db/connection");
-const { viewAllDepartments } = require('./db/departments');
+const { viewAllDepartments, addDepartment } = require('./db/departments');
 const { viewAllEmployees } = require("./db/employees");
-const { viewAllRoles } = require("./db/roles");
+const { viewAllRoles, addRole } = require("./db/roles");
 
 const start = async () => {
     console.log("Welcome to the Employee Manager!");
@@ -36,6 +36,16 @@ const start = async () => {
         case 'View all employees':
             const employees = await viewAllEmployees()
             console.table(employees)
+            break;
+        case 'Add a department':
+            const newDepartment = await addDepartment()
+            console.table(newDepartment)
+            break;
+        case 'Add a role':
+            const newRole = await addRole();
+            console.table(newRole)
+            break;
+
     }
     
 }
