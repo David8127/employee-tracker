@@ -56,6 +56,7 @@ const start = async () => {
         case 'Add an employee':
             const newEmployee = await addEmployee();
             console.table(newEmployee)
+            break;
         case 'Update an employee role':
             const updatedRole = await updateEmployeeRole();
             console.table(updatedRole)
