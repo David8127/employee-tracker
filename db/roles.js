@@ -58,4 +58,28 @@ async function addRole() {
     }
 }
 
-module.exports = { viewAllRoles, addRole }
+async function deleteRole() {
+    const roles = await viewAllRoles();
+    try {
+        const { deleted_role } = await prompt([
+            {
+                type: "list",
+                name: "deleted_role",
+                message: "Which role would you like to delete from the database?",
+                choices: roles.map((r) => {
+                    return {
+                        name: `${r.title}`,
+                        value: r.id
+                    }
+                })
+            },
+        ])
+        await db.query(`DELETE FROM role WHERE id="${deleted_role}"`)
+        const deleteRole = await viewAllRoles();
+        return deleteRole;
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+module.exports = { viewAllRoles, addRole, deleteRole }

@@ -24,6 +24,42 @@ async function viewAllEmployees() {
     }
 }
 
+async function viewEmployeesByManager() {
+    const managerList = await db.query(`
+        SELECT 
+            employee.id,
+            employee.first_name,
+            employee.last_name,
+            employee.manager_id,
+            role.title,
+            role.salary,
+            department.name AS department
+        FROM employee
+        LEFT JOIN role ON employee.role_id=role.id
+        LEFT JOIN department ON role.department_id=department.id
+        WHERE manager_id IS NULL;
+        `)
+    try {
+        const { manager } = await prompt([
+            {
+                type: "list",
+                name: "manager",
+                message: "Which manager's employees would you like to see?",
+                choices: managerList.map((m) => {
+                    return {
+                        name: `${m.first_name} ${m.last_name}`,
+                        value: m.id
+                    }
+                })
+            }
+        ])
+        const employeesByManager = await db.query(`SELECT employee.first_name, employee.last_name FROM employee WHERE manager_id = ("${manager}")`)
+        return employeesByManager;
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 async function addEmployee() {
     const employees = await viewAllEmployees();
     const roles = await viewAllRoles();
@@ -84,7 +120,7 @@ async function updateEmployeeRole() {
                 message: "Which employee's role are you updating?",
                 choices: employees.map((employee) => {
                     return {
-                        name: `${employee.first_name} ${employee.last_name} ` ,
+                        name: `${employee.first_name} ${employee.last_name} `,
                         value: employee.id
                     }
                 })
@@ -104,9 +140,33 @@ async function updateEmployeeRole() {
         await db.query(`UPDATE employee SET role_id = "${newRole}" WHERE id = "${employee}" `)
         const updatedRole = await viewAllEmployees();
         return updatedRole;
-    } catch (err){
+    } catch (err) {
         console.log(err)
     }
 }
 
-module.exports = { viewAllEmployees, addEmployee, updateEmployeeRole }
+async function deleteEmployee() {
+    const employees = await viewAllEmployees();
+    try {
+        const { deleted_employee } = await prompt([
+            {
+                type: "list",
+                name: "deleted_employee",
+                message: "Which employee would you like to delete from the database?",
+                choices: employees.map((e) => {
+                    return {
+                        name: `${e.first_name} ${e.last_name}`,
+                        value: e.id
+                    }
+                })
+            },
+        ])
+        await db.query(`DELETE FROM employee WHERE id="${deleted_employee}"`)
+        const deleteEmployee = await viewAllEmployees();
+        return deleteEmployee;
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+module.exports = { viewAllEmployees, addEmployee, updateEmployeeRole, viewEmployeesByManager, deleteEmployee }

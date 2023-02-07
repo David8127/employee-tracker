@@ -28,4 +28,28 @@ async function addDepartment() {
     }
 }
 
-module.exports = { viewAllDepartments, addDepartment }
+async function deleteDepartment() {
+    const departments = await viewAllDepartments();
+    try {
+        const { deleted_dept } = await prompt([
+            {
+                type: "list",
+                name: "deleted_dept",
+                message: "Which department would you like to delete from the database?",
+                choices: departments.map((d) => {
+                    return {
+                        name: `${d.name}`,
+                        value: d.id
+                    }
+                })
+            },
+        ])
+        await db.query(`DELETE FROM department WHERE id="${deleted_dept}"`)
+        const deleteDepartment = await viewAllDepartments();
+        return deleteDepartment;
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+module.exports = { viewAllDepartments, addDepartment, deleteDepartment }
